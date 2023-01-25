@@ -16,6 +16,9 @@ class MyApp extends StatelessWidget {
       title: 'Task Manager App',
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
+        textTheme: const TextTheme(
+          headline1: TextStyle(color: Colors.red),
+        ),
       ),
     );
   }
