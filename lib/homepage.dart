@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager_app/data/completed_tasks.dart';
@@ -38,8 +39,18 @@ class _MyHomePageState extends State<MyHomePage> {
               Text(pendingTasks[index].priority),
             ],
           ),
+          onTap: (() {
+            print(index);
+            GoRouter.of(context).go('/update/$index');
+          }),
           trailing: IconButton(
-            onPressed: () => _remove.call(pendingTasks[index]),
+            onPressed: () {
+              Fluttertoast.showToast(
+                msg: "Task completed",
+                backgroundColor: Colors.grey,
+              );
+              _remove(pendingTasks[index]);
+            },
             icon: const Icon(Icons.check_box_outline_blank),
           ),
         );
@@ -51,16 +62,29 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const Icon(Icons.grid_view_rounded),
         title: const Text('TaskManager'),
         actions: <Widget>[
           IconButton(
-              onPressed: (() => GoRouter.of(context).go('/history')),
-              icon: const Icon(Icons.history)),
+            onPressed: (() => GoRouter.of(context).go('/history')),
+            icon: const Icon(Icons.history),
+          ),
+          IconButton(
+              onPressed: ((() =>
+                  print('Settings have been clicked on homepage!'))),
+              icon: const Icon(Icons.settings_outlined))
         ],
       ),
-      body: _buildList(),
-      // Text(
-      //     "You have [ ${pendingTasks.length} ] pending task out of [ ${pendingTasks.length} ]"),
+      body: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text(
+              "You have [ ${pendingTasks.length} ] pending task out of [ ${pendingTasks.length} ]",
+            ),
+          ),
+          Expanded(child: _buildList()),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() => GoRouter.of(context).go('/add')),
         tooltip: 'Increment',

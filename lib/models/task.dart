@@ -1,11 +1,11 @@
 class Task {
   String title;
-  final date;
+  DateTime date;
   String priority;
 
   Task({
     this.title = "Please enter the title",
-    this.date,
+    required this.date,
     this.priority = "high",
   });
 }

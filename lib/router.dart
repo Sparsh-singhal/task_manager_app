@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+
+// pages
 import 'package:task_manager_app/history.dart';
 import 'package:task_manager_app/homepage.dart';
 import 'package:task_manager_app/add_task.dart';
@@ -10,8 +12,11 @@ GoRouter router = GoRouter(routes: [
     builder: (context, state) => const AddTask(),
   ),
   GoRoute(
-    path: '/update',
-    builder: (context, state) => const UpdateTask(),
+    path: '/update/:id',
+    name: 'update',
+    builder: (context, state) => UpdateTask(
+      id: state.params['id']!,
+    ),
   ),
   GoRoute(
     path: '/history',

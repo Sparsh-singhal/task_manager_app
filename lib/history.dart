@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager_app/data/completed_tasks.dart';
 import 'package:task_manager_app/data/pending_tasks.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+// models
 import './models/task.dart';
 
 class History extends StatefulWidget {
@@ -36,7 +39,13 @@ class _HistoryState extends State<History> {
               ],
             ),
             trailing: IconButton(
-              onPressed: () => _remove.call(completedTasks[index]),
+              onPressed: () {
+                Fluttertoast.showToast(
+                  msg: "Task Reassigned",
+                  backgroundColor: Colors.grey,
+                );
+                _remove(completedTasks[index]);
+              },
               icon: const Icon(
                 Icons.delete_forever,
                 color: Colors.red,
