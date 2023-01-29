@@ -24,34 +24,37 @@ class _HistoryState extends State<History> {
   }
 
   Widget _buildList() {
-    return ListView.builder(
-      itemCount: completedTasks.length,
-      itemBuilder: ((context, int index) {
-        return ListTile(
-            title: Text(completedTasks[index].title),
-            subtitle: Row(
-              children: [
-                Text(
-                  "${DateFormat.MMMM().format(completedTasks[index].date)} ${DateFormat.d().format(completedTasks[index].date)}, ${DateFormat.y().format(completedTasks[index].date)}",
-                ),
-                const Text(' • '),
-                Text(completedTasks[index].priority),
-              ],
-            ),
-            trailing: IconButton(
-              onPressed: () {
-                Fluttertoast.showToast(
-                  msg: "Task Reassigned",
-                  backgroundColor: Colors.grey,
-                );
-                _remove(completedTasks[index]);
-              },
-              icon: const Icon(
-                Icons.delete_forever,
-                color: Colors.red,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 23),
+      child: ListView.builder(
+        itemCount: completedTasks.length,
+        itemBuilder: ((context, int index) {
+          return ListTile(
+              title: Text(completedTasks[index].title),
+              subtitle: Row(
+                children: [
+                  Text(
+                    "${DateFormat.MMMM().format(completedTasks[index].date)} ${DateFormat.d().format(completedTasks[index].date)}, ${DateFormat.y().format(completedTasks[index].date)}",
+                  ),
+                  const Text(' • '),
+                  Text(completedTasks[index].priority),
+                ],
               ),
-            ));
-      }),
+              trailing: IconButton(
+                onPressed: () {
+                  Fluttertoast.showToast(
+                    msg: "Task Reassigned",
+                    backgroundColor: Colors.grey,
+                  );
+                  _remove(completedTasks[index]);
+                },
+                icon: const Icon(
+                  Icons.delete_forever,
+                  color: Colors.red,
+                ),
+              ));
+        }),
+      ),
     );
   }
 

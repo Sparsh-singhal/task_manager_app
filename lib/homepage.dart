@@ -26,35 +26,38 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildList() {
-    return ListView.builder(
-      itemCount: pendingTasks.length,
-      itemBuilder: (context, int index) {
-        return ListTile(
-          title: Text(pendingTasks[index].title),
-          subtitle: Row(
-            children: [
-              Text(
-                  "${DateFormat.MMMM().format(pendingTasks[index].date)} ${DateFormat.d().format(pendingTasks[index].date)}, ${DateFormat.y().format(pendingTasks[index].date)}"),
-              const Text(' • '),
-              Text(pendingTasks[index].priority),
-            ],
-          ),
-          onTap: (() {
-            print(index);
-            GoRouter.of(context).go('/update/$index');
-          }),
-          trailing: IconButton(
-            onPressed: () {
-              Fluttertoast.showToast(
-                msg: "Task completed",
-                backgroundColor: Colors.grey,
-              );
-              _remove(pendingTasks[index]);
-            },
-            icon: const Icon(Icons.check_box_outline_blank),
-          ),
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 23),
+      child: ListView.builder(
+        itemCount: pendingTasks.length,
+        itemBuilder: (context, int index) {
+          return ListTile(
+            title: Text(pendingTasks[index].title),
+            subtitle: Row(
+              children: [
+                Text(
+                    "${DateFormat.MMMM().format(pendingTasks[index].date)} ${DateFormat.d().format(pendingTasks[index].date)}, ${DateFormat.y().format(pendingTasks[index].date)}"),
+                const Text(' • '),
+                Text(pendingTasks[index].priority),
+              ],
+            ),
+            onTap: (() {
+              print(index);
+              GoRouter.of(context).go('/update/$index');
+            }),
+            trailing: IconButton(
+              onPressed: () {
+                Fluttertoast.showToast(
+                  msg: "Task completed",
+                  backgroundColor: Colors.grey,
+                );
+                _remove(pendingTasks[index]);
+              },
+              icon: const Icon(Icons.check_box_outline_blank),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -62,8 +65,21 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Icon(Icons.grid_view_rounded),
-        title: const Text('TaskManager'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: const Icon(
+          Icons.grid_view_rounded,
+          color: Colors.black,
+        ),
+        title: Row(
+          children: const [
+            Text(
+              'Task',
+              style: TextStyle(color: Colors.grey),
+            ),
+            Text('Manager'),
+          ],
+        ),
         actions: <Widget>[
           IconButton(
             onPressed: (() => GoRouter.of(context).go('/history')),

@@ -98,7 +98,7 @@ class _UpdateTaskState extends State<UpdateTask> {
               onPressed: (() => print('hi')),
               child: const Text('Update'),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             ElevatedButton(
               onPressed: (() => _deleteTask()),
               child: const Text('Delete'),
