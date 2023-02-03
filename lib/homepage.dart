@@ -29,20 +29,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 23),
       child: ListView.builder(
-        itemCount: pendingTasks.length,
+        itemCount: matchQuery.length,
         itemBuilder: (context, int index) {
           return ListTile(
-            title: Text(pendingTasks[index].title),
+            title: Text(pendingTasks[matchQuery[index]].title),
             subtitle: Row(
               children: [
                 Text(
-                    "${DateFormat.MMMM().format(pendingTasks[index].date)} ${DateFormat.d().format(pendingTasks[index].date)}, ${DateFormat.y().format(pendingTasks[index].date)}"),
+                    "${DateFormat.MMMM().format(pendingTasks[matchQuery[index]].date)} ${DateFormat.d().format(pendingTasks[matchQuery[index]].date)}, ${DateFormat.y().format(pendingTasks[matchQuery[index]].date)}"),
                 const Text(' • '),
-                Text(pendingTasks[index].priority),
+                Text(pendingTasks[matchQuery[index]].priority),
               ],
             ),
             onTap: (() {
-              print(index);
+              print(matchQuery[index]);
               GoRouter.of(context).go('/update/$index');
             }),
             trailing: IconButton(
@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   msg: "Task completed",
                   backgroundColor: Colors.grey,
                 );
-                _remove(pendingTasks[index]);
+                _remove(pendingTasks[matchQuery[index]]);
               },
               icon: const Icon(Icons.check_box_outline_blank),
             ),
@@ -59,6 +59,26 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
+  }
+
+  List<int> matchQuery = [for (var i = 0; i < pendingTasks.length; i++) i];
+
+  void search(query) {
+    setState(() {
+      if (query.isEmpty) {
+        matchQuery = [for (var i = 0; i < pendingTasks.length; i++) i];
+      } else {
+        matchQuery = [];
+        for (int i = 0; i < pendingTasks.length; i++) {
+          if (pendingTasks[i]
+              .title
+              .toLowerCase()
+              .contains(query.toLowerCase())) {
+            matchQuery.add(i);
+          }
+        }
+      }
+    });
   }
 
   @override
@@ -93,9 +113,26 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: <Widget>[
-          ListTile(
-            title: Text(
-              "You have [ ${pendingTasks.length} ] pending task out of [ ${pendingTasks.length} ]",
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 27,
+              vertical: 10,
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
+                hintText:
+                    "You have [ ${pendingTasks.length} ] pending task out of [ ${pendingTasks.length} ]",
+                labelText: "Search",
+                border: const OutlineInputBorder(),
+              ),
+              textInputAction: TextInputAction.search,
+              onChanged: ((value) {
+                search(value);
+              }),
             ),
           ),
           Expanded(child: _buildList()),

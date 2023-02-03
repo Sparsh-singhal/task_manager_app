@@ -86,19 +86,19 @@ class _UpdateTaskState extends State<UpdateTask> {
       ),
       body: Center(
         child: ListView(
-          padding: const EdgeInsets.all(32.0),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
           children: [
             buildTitle(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
             buildDate(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
             buildPriority(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
             ElevatedButton(
               onPressed: (() => print('hi')),
               child: const Text('Update'),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: (() => _deleteTask()),
               child: const Text('Delete'),

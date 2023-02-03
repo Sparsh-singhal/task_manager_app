@@ -16,13 +16,14 @@ class MyApp extends StatelessWidget {
       title: 'Task Manager App',
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 194, 65, 56),
-        // primarySwatch: MaterialColor(),
+        primarySwatch: Colors.grey,
         colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color.fromARGB(255, 194, 65, 56),
             padding: const EdgeInsets.all(20),
-            // textStyle: TextStyle(fontWeight: FontWeight.w400), // This is throwing some error
+            // textStyle:
+            //     const TextStyle(fontSize: 20), // This is throwing some error
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
