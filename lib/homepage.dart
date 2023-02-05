@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager_app/data/completed_tasks.dart';
+import 'package:task_manager_app/update_task.dart';
 
 // models
 import './models/task.dart';
@@ -25,25 +26,38 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _actionOnTap(index) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UpdateTask(id: '$index'),
+      ),
+    );
+    if (result) {
+      pendingTasks.remove(pendingTasks[index]);
+    }
+    setState(() {});
+  }
+
   Widget _buildList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 23),
       child: ListView.builder(
-        itemCount: matchQuery.length,
+        itemCount: pendingTasks.length,
         itemBuilder: (context, int index) {
           return ListTile(
-            title: Text(pendingTasks[matchQuery[index]].title),
+            title: Text(pendingTasks[index].title),
             subtitle: Row(
               children: [
                 Text(
-                    "${DateFormat.MMMM().format(pendingTasks[matchQuery[index]].date)} ${DateFormat.d().format(pendingTasks[matchQuery[index]].date)}, ${DateFormat.y().format(pendingTasks[matchQuery[index]].date)}"),
+                    "${DateFormat.MMMM().format(pendingTasks[index].date)} ${DateFormat.d().format(pendingTasks[index].date)}, ${DateFormat.y().format(pendingTasks[index].date)}"),
                 const Text(' • '),
-                Text(pendingTasks[matchQuery[index]].priority),
+                Text(pendingTasks[index].priority),
               ],
             ),
             onTap: (() {
-              print(matchQuery[index]);
-              GoRouter.of(context).go('/update/$index');
+              _actionOnTap(index);
+              // GoRouter.of(context).go('/update/$index');
             }),
             trailing: IconButton(
               onPressed: () {
@@ -51,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   msg: "Task completed",
                   backgroundColor: Colors.grey,
                 );
-                _remove(pendingTasks[matchQuery[index]]);
+                _remove(pendingTasks[index]);
               },
               icon: const Icon(Icons.check_box_outline_blank),
             ),
@@ -61,25 +75,25 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  List<int> matchQuery = [for (var i = 0; i < pendingTasks.length; i++) i];
+  // List<int> matchQuery = [for (var i = 0; i < pendingTasks.length; i++) i];
 
-  void search(query) {
-    setState(() {
-      if (query.isEmpty) {
-        matchQuery = [for (var i = 0; i < pendingTasks.length; i++) i];
-      } else {
-        matchQuery = [];
-        for (int i = 0; i < pendingTasks.length; i++) {
-          if (pendingTasks[i]
-              .title
-              .toLowerCase()
-              .contains(query.toLowerCase())) {
-            matchQuery.add(i);
-          }
-        }
-      }
-    });
-  }
+  // void search(query) {
+  //   setState(() {
+  //     if (query.isEmpty) {
+  //       matchQuery = [for (var i = 0; i < pendingTasks.length; i++) i];
+  //     } else {
+  //       matchQuery = [];
+  //       for (int i = 0; i < pendingTasks.length; i++) {
+  //         if (pendingTasks[i]
+  //             .title
+  //             .toLowerCase()
+  //             .contains(query.toLowerCase())) {
+  //           matchQuery.add(i);
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -105,36 +119,41 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: (() => GoRouter.of(context).go('/history')),
             icon: const Icon(Icons.history),
           ),
+          const Icon(Icons.settings_outlined),
           IconButton(
-              onPressed: ((() =>
-                  print('Settings have been clicked on homepage!'))),
-              icon: const Icon(Icons.settings_outlined))
+              onPressed: ((() => showSearch(
+                    context: context,
+                    delegate: CustomSearchDelegate(),
+                  ))),
+              icon: const Icon(Icons.search)),
         ],
       ),
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 27,
-              vertical: 10,
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 10,
-                ),
-                hintText:
-                    "You have [ ${pendingTasks.length} ] pending task out of [ ${pendingTasks.length} ]",
-                labelText: "Search",
-                border: const OutlineInputBorder(),
-              ),
-              textInputAction: TextInputAction.search,
-              onChanged: ((value) {
-                search(value);
-              }),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(
+          //     horizontal: 27,
+          //     vertical: 10,
+          //   ),
+          //   child:
+          //   TextField(
+          //     decoration: InputDecoration(
+          //       contentPadding: const EdgeInsets.symmetric(
+          //         horizontal: 10,
+          //         vertical: 10,
+          //       ),
+          //       hintText:
+          //           "You have [ ${pendingTasks.length} ] pending task out of [ ${pendingTasks.length} ]",
+          //       labelText: "Search",
+          //       border: const OutlineInputBorder(),
+          //     ),
+          //     textInputAction: TextInputAction.search,
+          //     onTap: (() => CustomSearchDelegate()),
+          //     onChanged: ((value) {
+          //       search(value);
+          //     }),
+          //   ),
+          // ),
           Expanded(child: _buildList()),
         ],
       ),
@@ -143,6 +162,94 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class CustomSearchDelegate extends SearchDelegate {
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        onPressed: () {
+          query = '';
+        },
+        icon: const Icon(Icons.clear),
+      ),
+    ];
+  }
+
+  // second overwrite to pop out of search menu
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        close(context, null);
+      },
+      icon: const Icon(Icons.arrow_back),
+    );
+  }
+
+  // third overwrite to show query result
+  Future<void> actionOnTap(context, index) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UpdateTask(id: '$index'),
+      ),
+    );
+    if (result) {
+      pendingTasks.remove(pendingTasks[index]);
+    }
+    buildResults(context);
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var task in pendingTasks) {
+      if (task.title.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(task.title);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+          onTap: (() {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UpdateTask(id: '$index'),
+              ),
+            );
+          }),
+        );
+      },
+    );
+  }
+
+  // last overwrite to show the
+  // querying process at the runtime
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var task in pendingTasks) {
+      if (task.title.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(task.title);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(
+          title: Text(result),
+          onTap: (() => actionOnTap(context, index)),
+        );
+      },
     );
   }
 }

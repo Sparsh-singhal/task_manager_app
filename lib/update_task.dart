@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:task_manager_app/models/task.dart';
 import './data/pending_tasks.dart';
 
 class UpdateTask extends StatefulWidget {
@@ -13,28 +14,53 @@ class UpdateTask extends StatefulWidget {
 class _UpdateTaskState extends State<UpdateTask> {
   int get index => int.parse(widget.id);
 
+  var task = Task(
+    title: "",
+    date: DateTime.now(),
+    priority: "High",
+  );
+
   Widget buildTitle() {
-    return TextField(
+    return TextFormField(
       decoration: InputDecoration(
         hintText: pendingTasks[index].title,
         labelText: 'Title',
         border: const OutlineInputBorder(),
       ),
+      initialValue: pendingTasks[index].title,
       textInputAction: TextInputAction.next,
+      onChanged: ((value) {
+        setState(() {
+          task.title = value;
+        });
+      }),
     );
   }
 
   Widget buildDate() {
-    return InputDecorator(
-      decoration: InputDecoration(
-        hintText: "${pendingTasks[index].date}",
-        labelText: 'Date',
-        border: const OutlineInputBorder(),
+    // return InputDecorator(
+    //   decoration: InputDecoration(
+    //     hintText: "${pendingTasks[index].date}",
+    //     labelText: 'Date',
+    //     border: const OutlineInputBorder(),
+    //   ),
+    // );
+    return TextField(
+      decoration: const InputDecoration(
+        hintText: "01/01/2023",
+        labelText: "Date",
+        border: OutlineInputBorder(),
       ),
+      textInputAction: TextInputAction.next,
+      onSubmitted: ((value) {
+        setState(() {
+          task.date = DateTime.now();
+        });
+      }),
     );
   }
 
-  String? _val;
+  // String? _val;
 
   Widget buildPriority() {
     return InputDecorator(
@@ -49,7 +75,7 @@ class _UpdateTaskState extends State<UpdateTask> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton(
           hint: Text(pendingTasks[index].priority),
-          value: _val,
+          value: pendingTasks[index].priority,
           items: const [
             DropdownMenuItem(value: 'High', child: Text('High')),
             DropdownMenuItem(value: 'Medium', child: Text('Medium')),
@@ -58,7 +84,7 @@ class _UpdateTaskState extends State<UpdateTask> {
           icon: const Icon(Icons.arrow_drop_down_circle),
           onChanged: (value) {
             setState(() {
-              _val = value;
+              pendingTasks[index].priority = value as String;
             });
           },
         ),
@@ -66,12 +92,21 @@ class _UpdateTaskState extends State<UpdateTask> {
     );
   }
 
-  Future<void> _deleteTask() async {
+  void _deleteTask() {
     // print("deleted $index");
-    await (() => GoRouter.of(context).go('/'));
+    // GoRouter.of(context).go('/');
+    Navigator.pop(context, true);
+    // setState(() {
+    //   pendingTasks.remove(pendingTasks[index]);
+    // });
+  }
+
+  void _submitUpdatedTask() {
+    // GoRouter.of(context).go('/');
     setState(() {
-      pendingTasks.remove(pendingTasks[index]);
+      pendingTasks[index] = task;
     });
+    Navigator.pop(context, false);
   }
 
   @override
@@ -80,7 +115,7 @@ class _UpdateTaskState extends State<UpdateTask> {
       appBar: AppBar(
         title: const Text("Update Task"),
         leading: IconButton(
-          onPressed: (() => GoRouter.of(context).go('/')),
+          onPressed: ((() => Navigator.pop(context, false))),
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
       ),
@@ -95,7 +130,7 @@ class _UpdateTaskState extends State<UpdateTask> {
             buildPriority(),
             const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: (() => print('hi')),
+              onPressed: (() => _submitUpdatedTask()),
               child: const Text('Update'),
             ),
             const SizedBox(height: 20),

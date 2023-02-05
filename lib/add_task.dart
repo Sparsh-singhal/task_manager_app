@@ -33,10 +33,9 @@ class Form extends StatefulWidget {
 
 class _FormState extends State<Form> {
   final GlobalKey<FormState> _formKey = GlobalKey();
-  String? _val = "High";
 
   var task = Task(
-    title: "Send an email to the team",
+    title: "",
     date: DateTime.now(),
     priority: "Low",
   );
@@ -49,9 +48,25 @@ class _FormState extends State<Form> {
         border: OutlineInputBorder(),
       ),
       textInputAction: TextInputAction.next,
-      onSubmitted: ((value) {
+      onChanged: ((value) {
         setState(() {
           task.title = value;
+        });
+      }),
+    );
+  }
+
+  Widget buildDate() {
+    return TextField(
+      decoration: const InputDecoration(
+        hintText: "01/01/2023",
+        labelText: "Date",
+        border: OutlineInputBorder(),
+      ),
+      textInputAction: TextInputAction.next,
+      onSubmitted: ((value) {
+        setState(() {
+          task.date = DateTime.now();
         });
       }),
     );
@@ -71,10 +86,10 @@ class _FormState extends State<Form> {
         child: DropdownButton(
           onChanged: ((String? value) {
             setState(() {
-              _val = value;
+              task.priority = value as String;
             });
           }),
-          value: _val,
+          value: task.priority,
           items: const [
             DropdownMenuItem(value: 'High', child: Text('High')),
             DropdownMenuItem(value: 'Medium', child: Text('Medium')),
@@ -104,6 +119,8 @@ class _FormState extends State<Form> {
         //   key: _formKey,
         // )
         buildTitle(),
+        const SizedBox(height: 40),
+        buildDate(),
         const SizedBox(height: 40),
         buildPriority(),
         const SizedBox(height: 40),
