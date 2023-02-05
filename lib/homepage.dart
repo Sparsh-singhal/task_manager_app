@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:task_manager_app/data/completed_tasks.dart';
+
+// classes
 import 'package:task_manager_app/update_task.dart';
+import './homepage/custom_search_delegate.dart';
 
 // models
 import './models/task.dart';
 
 // data
 import './data/pending_tasks.dart';
+import './data/completed_tasks.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -121,10 +124,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           const Icon(Icons.settings_outlined),
           IconButton(
-              onPressed: ((() => showSearch(
-                    context: context,
-                    delegate: CustomSearchDelegate(),
-                  ))),
+              onPressed: ((() async {
+                await showSearch(
+                  context: context,
+                  delegate: CustomSearchDelegate(),
+                );
+                setState(() {});
+              })),
               icon: const Icon(Icons.search)),
         ],
       ),
@@ -162,94 +168,6 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
-    );
-  }
-}
-
-class CustomSearchDelegate extends SearchDelegate {
-  @override
-  List<Widget>? buildActions(BuildContext context) {
-    return [
-      IconButton(
-        onPressed: () {
-          query = '';
-        },
-        icon: const Icon(Icons.clear),
-      ),
-    ];
-  }
-
-  // second overwrite to pop out of search menu
-  @override
-  Widget? buildLeading(BuildContext context) {
-    return IconButton(
-      onPressed: () {
-        close(context, null);
-      },
-      icon: const Icon(Icons.arrow_back),
-    );
-  }
-
-  // third overwrite to show query result
-  Future<void> actionOnTap(context, index) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UpdateTask(id: '$index'),
-      ),
-    );
-    if (result) {
-      pendingTasks.remove(pendingTasks[index]);
-    }
-    buildResults(context);
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var task in pendingTasks) {
-      if (task.title.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(task.title);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-          onTap: (() {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UpdateTask(id: '$index'),
-              ),
-            );
-          }),
-        );
-      },
-    );
-  }
-
-  // last overwrite to show the
-  // querying process at the runtime
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var task in pendingTasks) {
-      if (task.title.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(task.title);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-          onTap: (() => actionOnTap(context, index)),
-        );
-      },
     );
   }
 }

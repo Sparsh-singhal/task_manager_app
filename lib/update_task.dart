@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:task_manager_app/models/task.dart';
 import './data/pending_tasks.dart';
 
@@ -37,26 +37,32 @@ class _UpdateTaskState extends State<UpdateTask> {
     );
   }
 
+  final _textFieldValueHolder = TextEditingController();
   Widget buildDate() {
-    // return InputDecorator(
-    //   decoration: InputDecoration(
-    //     hintText: "${pendingTasks[index].date}",
-    //     labelText: 'Date',
-    //     border: const OutlineInputBorder(),
-    //   ),
-    // );
     return TextField(
-      decoration: const InputDecoration(
-        hintText: "01/01/2023",
+      decoration: InputDecoration(
+        hintText: DateFormat.yMMMMd().format(DateTime.now()),
         labelText: "Date",
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
       textInputAction: TextInputAction.next,
-      onSubmitted: ((value) {
-        setState(() {
-          task.date = DateTime.now();
-        });
-      }),
+      readOnly: true,
+      controller: _textFieldValueHolder,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+            context: context, //context of current state
+            initialDate: DateTime.now(),
+            firstDate: DateTime(
+                2000), //DateTime.now() - not to allow to choose before today.
+            lastDate: DateTime(2101));
+
+        if (pickedDate != null) {
+          setState(() {
+            task.date = pickedDate;
+            _textFieldValueHolder.text = DateFormat.yMMMMd().format(pickedDate);
+          });
+        }
+      },
     );
   }
 
@@ -74,7 +80,6 @@ class _UpdateTaskState extends State<UpdateTask> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton(
-          hint: Text(pendingTasks[index].priority),
           value: pendingTasks[index].priority,
           items: const [
             DropdownMenuItem(value: 'High', child: Text('High')),
@@ -84,7 +89,8 @@ class _UpdateTaskState extends State<UpdateTask> {
           icon: const Icon(Icons.arrow_drop_down_circle),
           onChanged: (value) {
             setState(() {
-              pendingTasks[index].priority = value as String;
+              task.priority = value as String;
+              pendingTasks[index].priority = value;
             });
           },
         ),
@@ -103,6 +109,7 @@ class _UpdateTaskState extends State<UpdateTask> {
 
   void _submitUpdatedTask() {
     // GoRouter.of(context).go('/');
+    if (task.title == "") task.title = pendingTasks[index].title;
     setState(() {
       pendingTasks[index] = task;
     });

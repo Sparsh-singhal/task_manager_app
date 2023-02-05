@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:task_manager_app/data/pending_tasks.dart';
 import 'package:task_manager_app/models/task.dart';
 
@@ -32,8 +33,6 @@ class Form extends StatefulWidget {
 }
 
 class _FormState extends State<Form> {
-  final GlobalKey<FormState> _formKey = GlobalKey();
-
   var task = Task(
     title: "",
     date: DateTime.now(),
@@ -56,19 +55,33 @@ class _FormState extends State<Form> {
     );
   }
 
+  final _textFieldValueHolder = TextEditingController();
+
   Widget buildDate() {
-    return TextField(
+    return TextFormField(
       decoration: const InputDecoration(
         hintText: "01/01/2023",
         labelText: "Date",
         border: OutlineInputBorder(),
       ),
       textInputAction: TextInputAction.next,
-      onSubmitted: ((value) {
-        setState(() {
-          task.date = DateTime.now();
-        });
-      }),
+      controller: _textFieldValueHolder,
+      readOnly: true,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+            context: context, //context of current state
+            initialDate: DateTime.now(),
+            firstDate: DateTime(
+                2000), //DateTime.now() - not to allow to choose before today.
+            lastDate: DateTime(2101));
+
+        if (pickedDate != null) {
+          setState(() {
+            task.date = pickedDate;
+            _textFieldValueHolder.text = DateFormat.yMMMMd().format(pickedDate);
+          });
+        }
+      },
     );
   }
 
@@ -115,9 +128,6 @@ class _FormState extends State<Form> {
         vertical: 40,
       ),
       children: <Widget>[
-        // Form(
-        //   key: _formKey,
-        // )
         buildTitle(),
         const SizedBox(height: 40),
         buildDate(),
