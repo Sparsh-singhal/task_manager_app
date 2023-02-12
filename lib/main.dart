@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './router.dart';
 
+import './providers/pending_tasks_provider.dart';
+import './providers/completed_tasks_provider.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => PendingTasks()),
+      ChangeNotifierProvider(create: (_) => CompletedTasks()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

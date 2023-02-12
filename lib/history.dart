@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:task_manager_app/data/completed_tasks.dart';
-import 'package:task_manager_app/data/pending_tasks.dart';
+// import 'package:task_manager_app/data/completed_tasks.dart';
+// import 'package:task_manager_app/data/pending_tasks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
-// models
-import './models/task.dart';
+// providers
+import './providers/pending_tasks_provider.dart';
+import './providers/completed_tasks_provider.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
@@ -16,28 +18,36 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  void _remove(Task task) {
-    setState(() {
-      completedTasks.remove(task);
-      pendingTasks.add(task);
-    });
+  void _remove(int index) {
+    // setState(() {
+    //   completedTasks.remove(task);
+    //   pendingTasks.add(task);
+    // });
+    context
+        .read<PendingTasks>()
+        .addTask(context.read<CompletedTasks>().completedTasks[index]);
+    context.read<CompletedTasks>().deleteTask(index);
   }
 
   Widget _buildList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 23),
       child: ListView.builder(
-        itemCount: completedTasks.length,
+        itemCount: context.watch<CompletedTasks>().completedTasks.length,
         itemBuilder: ((context, int index) {
           return ListTile(
-              title: Text(completedTasks[index].title),
+              title: Text(
+                  context.watch<CompletedTasks>().completedTasks[index].title),
               subtitle: Row(
                 children: [
                   Text(
-                    "${DateFormat.MMMM().format(completedTasks[index].date)} ${DateFormat.d().format(completedTasks[index].date)}, ${DateFormat.y().format(completedTasks[index].date)}",
+                    "${DateFormat.MMMM().format(context.watch<CompletedTasks>().completedTasks[index].date)} ${DateFormat.d().format(context.watch<CompletedTasks>().completedTasks[index].date)}, ${DateFormat.y().format(context.watch<CompletedTasks>().completedTasks[index].date)}",
                   ),
                   const Text(' • '),
-                  Text(completedTasks[index].priority),
+                  Text(context
+                      .watch<CompletedTasks>()
+                      .completedTasks[index]
+                      .priority),
                 ],
               ),
               trailing: IconButton(
@@ -46,7 +56,7 @@ class _HistoryState extends State<History> {
                     msg: "Task Reassigned",
                     backgroundColor: Colors.grey,
                   );
-                  _remove(completedTasks[index]);
+                  _remove(index);
                 },
                 icon: const Icon(
                   Icons.delete_forever,

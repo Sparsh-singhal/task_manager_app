@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import '../data/pending_tasks.dart';
+import 'package:provider/provider.dart';
+// import '../data/pending_tasks.dart';
 import 'package:task_manager_app/update_task.dart';
+
+// providers
+import '../providers/pending_tasks_provider.dart';
 
 class CustomSearchDelegate extends SearchDelegate {
   @override
@@ -31,7 +35,7 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
-    for (var task in pendingTasks) {
+    for (var task in context.watch<PendingTasks>().pendingTasks) {
       if (task.title.toLowerCase().contains(query.toLowerCase())) {
         matchQuery.add(task.title);
       }
@@ -52,7 +56,8 @@ class CustomSearchDelegate extends SearchDelegate {
       ),
     );
     if (result) {
-      pendingTasks.remove(pendingTasks[index]);
+      context.read<PendingTasks>().deleteTask(index);
+      // pendingTasks.remove(pendingTasks[index]);
     }
     buildResults(context);
   }
@@ -62,7 +67,7 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
-    for (var task in pendingTasks) {
+    for (var task in context.watch<PendingTasks>().pendingTasks) {
       if (task.title.toLowerCase().contains(query.toLowerCase())) {
         matchQuery.add(task.title);
       }

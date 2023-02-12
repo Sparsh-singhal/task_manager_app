@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:task_manager_app/models/task.dart';
-import './data/pending_tasks.dart';
+import 'package:provider/provider.dart';
+
+// providers
+import './providers/pending_tasks_provider.dart';
 
 class UpdateTask extends StatefulWidget {
   final String id;
@@ -23,11 +26,11 @@ class _UpdateTaskState extends State<UpdateTask> {
   Widget buildTitle() {
     return TextFormField(
       decoration: InputDecoration(
-        hintText: pendingTasks[index].title,
+        hintText: context.read<PendingTasks>().pendingTasks[index].title,
         labelText: 'Title',
         border: const OutlineInputBorder(),
       ),
-      initialValue: pendingTasks[index].title,
+      initialValue: context.read<PendingTasks>().pendingTasks[index].title,
       textInputAction: TextInputAction.next,
       onChanged: ((value) {
         setState(() {
@@ -80,7 +83,7 @@ class _UpdateTaskState extends State<UpdateTask> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton(
-          value: pendingTasks[index].priority,
+          value: context.read<PendingTasks>().pendingTasks[index].priority,
           items: const [
             DropdownMenuItem(value: 'High', child: Text('High')),
             DropdownMenuItem(value: 'Medium', child: Text('Medium')),
@@ -90,7 +93,7 @@ class _UpdateTaskState extends State<UpdateTask> {
           onChanged: (value) {
             setState(() {
               task.priority = value as String;
-              pendingTasks[index].priority = value;
+              context.read<PendingTasks>().pendingTasks[index].priority = value;
             });
           },
         ),
@@ -99,21 +102,20 @@ class _UpdateTaskState extends State<UpdateTask> {
   }
 
   void _deleteTask() {
-    // print("deleted $index");
-    // GoRouter.of(context).go('/');
-    Navigator.pop(context, true);
-    // setState(() {
-    //   pendingTasks.remove(pendingTasks[index]);
-    // });
+    context.read<PendingTasks>().deleteTask(index);
+    Navigator.pop(context);
   }
 
   void _submitUpdatedTask() {
     // GoRouter.of(context).go('/');
-    if (task.title == "") task.title = pendingTasks[index].title;
-    setState(() {
-      pendingTasks[index] = task;
-    });
-    Navigator.pop(context, false);
+    if (task.title == "") {
+      task.title = context.read<PendingTasks>().pendingTasks[index].title;
+    }
+    context.read<PendingTasks>().updateTask(index, task);
+    // setState(() {
+    //   context.read<PendingTasks>().pendingTasks[index] = task;
+    // });
+    Navigator.pop(context);
   }
 
   @override

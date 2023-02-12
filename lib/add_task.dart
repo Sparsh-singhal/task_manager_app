@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:task_manager_app/data/pending_tasks.dart';
+// import 'package:task_manager_app/data/pending_tasks.dart';
 import 'package:task_manager_app/models/task.dart';
+import 'package:provider/provider.dart';
+import './providers/pending_tasks_provider.dart';
 
 class AddTask extends StatelessWidget {
   const AddTask({super.key});
@@ -114,9 +116,10 @@ class _FormState extends State<Form> {
   }
 
   void _submit() {
-    setState(() {
-      pendingTasks.add(task);
-    });
+    // setState(() {
+    //   pendingTasks.add(task);
+    // });
+    context.read<PendingTasks>().addTask(task);
     GoRouter.of(context).go('/');
   }
 
